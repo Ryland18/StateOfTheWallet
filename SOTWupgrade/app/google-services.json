@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "875024251196",
+    "firebase_url": "https://stateofthewalletfirebase-default-rtdb.firebaseio.com",
+    "project_id": "stateofthewalletfirebase",
+    "storage_bucket": "stateofthewalletfirebase.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:875024251196:android:8f65ba259ffee94f8c4639",
+        "android_client_info": {
+          "package_name": "com.example.stateofthewallet"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCKwP69WR3pzrlXI5C1qGb1eCpoJ9tpvDI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
