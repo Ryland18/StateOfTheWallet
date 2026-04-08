@@ -39,7 +39,9 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (!registerMode) {
-                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                    Intent i = new Intent(LoginActivity.this, MainActivity.class);
+                    i.putExtra("username", codeNameEditTXT);
+                    startActivity(i);
                 }
                 else{
                     //TODO: password strength test... be a good function for here ----Done

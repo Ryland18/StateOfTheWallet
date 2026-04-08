@@ -2,6 +2,7 @@ package com.example.stateofthewallet;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
@@ -50,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
         //  At budget or FISCAL STABILITY MAINTAINED
 
         //TODO:  Double check for title case on all data displayed
+
         //TODO:  Double check the amount is always 2 decimals
         //  HINT: might have to do these in the adapter......
 
@@ -79,6 +81,8 @@ public class MainActivity extends AppCompatActivity {
 
         if (id==R.id.action_settings){
             //TODO: navigate to settings page
+            Intent i = new Intent(MainActivity.this, Settings.class);
+            startActivity(i);
             return true;
         } else if (id==R.id.filter_all) {
             //TODO: filter the stream to include all transactions

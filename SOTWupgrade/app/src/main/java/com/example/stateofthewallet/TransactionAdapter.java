@@ -88,9 +88,16 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
         holder.tvDate.setText("Date: "+sdf.format(new Date(t.getDateTimestamp())));
 
         //TODO: need to be sure only 2 decimals...
-        holder.tvAmount.setText("$ "+t.getAmount());
+        holder.tvAmount.setText("$ "+String.format("%.2f",t.getAmount()));
 
         //TODO: change the text color based on income or outcome
+
+        if (t.isDeposit()){
+            holder.tvAmount.setTextColor(this, R.color.green);
+        }
+        else {
+            holder.tvAmount.setTextColor(this, R.color.red);
+        }
 
     }
 
@@ -130,6 +137,8 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
                 list.sort(Comparator.comparingLong(Transaction::getDateTimestamp)); //compare using the getDateTimestamp
                 break;
             //TODO:  Amount hi vs lo and lo vs hi
+            case 2:
+                list.sort(Comparator.comparing(Transaction::getAmount));
         }
     }
     //updates the sorting mode and refreshes the current list
@@ -153,7 +162,11 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
             processedList = masterList.stream().filter(Transaction::isDeposit).collect(Collectors.toList());
         }
         else{
-            processedList = new ArrayList<>(masterList);
+            try {
+                processedList = masterList.stream().collect(Collectors.toList());
+            } catch (Exception e) {
+                processedList = new ArrayList<>(masterList);
+            }
         }
         //2.  apply sort
         applySort(processedList);
