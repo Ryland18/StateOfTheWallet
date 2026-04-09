@@ -158,6 +158,7 @@ public class AddEntryActivity extends AppCompatActivity {
                         etNotes.getText().toString(),
                         amountValue, isDeposit,
                         selectedDate);
+                Log.d("changing", String.valueOf(t));
 
                 updateTransaction(t);
             }else {
@@ -185,7 +186,7 @@ public class AddEntryActivity extends AppCompatActivity {
                     Intent i = new Intent(AddEntryActivity.this, MainActivity.class);
                     startActivity(i);
                 } else{
-                    Snackbar.make(findViewById(R.id.container),errorMessage,Snackbar.LENGTH_LONG).show();
+                    Snackbar.make(findViewById(android.R.id.content),errorMessage,Snackbar.LENGTH_LONG).show();
                 }
             }
         });
@@ -199,10 +200,10 @@ public class AddEntryActivity extends AppCompatActivity {
                     Intent i = new Intent(AddEntryActivity.this, MainActivity.class);
                     startActivity(i);
                 } else{
-                    Snackbar.make(findViewById(R.id.container),errorMessage,Snackbar.LENGTH_LONG).show();
+//                   Toast.makeText(this,errorMessage, Toast.LENGTH_LONG).show();
+                   Snackbar.make(findViewById(android.R.id.content),errorMessage,Snackbar.LENGTH_LONG).show();
                 }
-            }
-        });
+            }});
     }
 
 

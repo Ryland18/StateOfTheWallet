@@ -1,7 +1,10 @@
 package com.example.stateofthewallet;
 
 
+
+import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.graphics.Color;
 import android.hardware.camera2.CaptureRequest;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,6 +14,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.stateofthewallet.data.model.Transaction;
@@ -77,6 +81,7 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
     }
 
     //Method to insert data into our cards
+    @SuppressLint("ResourceAsColor")
     @Override
     public void onBindViewHolder(@NonNull TransactionAdapter.TransactionViewHolder holder, int position) {
         Transaction t = transactionList.get(position);
@@ -91,13 +96,12 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
         holder.tvAmount.setText("$ "+String.format("%.2f",t.getAmount()));
 
         //TODO: change the text color based on income or outcome
-
-        if (t.isDeposit()){
-            holder.tvAmount.setTextColor(this, R.color.green);
-        }
-        else {
-            holder.tvAmount.setTextColor(this, R.color.red);
-        }
+            Log.d("Calling",String.valueOf(t.isDeposit()));
+            if (t.isDeposit()) {
+                holder.tvAmount.setTextColor(Color.parseColor("#00FF00"));
+            } else {
+                holder.tvAmount.setTextColor(Color.parseColor("#FF0000"));
+            }
 
     }
 
@@ -173,6 +177,7 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
         //3.  update the adapter's display list
         transactionList=processedList;
         notifyDataSetChanged();
+        MainActivity.briefingStats();
     }
 }
 

@@ -3,6 +3,7 @@ package com.example.stateofthewallet;
 import android.content.Intent;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
@@ -14,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.stateofthewallet.data.model.Transaction;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,7 +27,16 @@ public class MainActivity extends AppCompatActivity {
 
     private RecyclerView rvEvidenceStream;
     private TransactionAdapter adapter;
-    private List<Transaction> transactionList;
+
+    private static TextView totalIncome;
+
+    private static TextView totalExpenses;
+
+    private TextView statusTxt;
+
+
+
+    private static List<Transaction> transactionList;
     private TextView tvTotalIncome, tvTotalExpenses, tvNetStatus;
 
     @Override
@@ -39,12 +50,18 @@ public class MainActivity extends AppCompatActivity {
         rvEvidenceStream = findViewById(R.id.rvEvidenceStream);
 
         //RecyclerView and Adapters
+
+        statusTxt = findViewById(R.id.tvNetStatus);
+        totalExpenses = findViewById(R.id.tvTotalExpenses);
+        totalIncome = findViewById(R.id.tvTotalIncome);
+
         adapter = new TransactionAdapter(transactionList);
         adapter.importFirebaseData();
         rvEvidenceStream.setAdapter(adapter);
         rvEvidenceStream.setLayoutManager(new LinearLayoutManager(this));
 
         //TODO: calculate briefingStats() aka update the top part
+        
         //TODO: updateFiscalStabilityStatus() aka update the Status in the top part
         //  Overbudget or FISCAL COLLAPSE IMMINENT
         //  Underbudget or UNEXPLAINED SURPLUS DETECTED
@@ -64,6 +81,27 @@ public class MainActivity extends AppCompatActivity {
             startActivity(i);
         });
 
+    }
+
+    public static void briefingStats() {
+
+        double income = 0;
+        double expenses = 0;
+
+        for (int i = 0; i<transactionList.size();i++){
+            if (transactionList.get(i).isDeposit()) {
+                income += transactionList.get(i).getAmount();
+            }else{
+                expenses += transactionList.get(i).getAmount();
+            }
+        }
+        String tIncome = String.format("%.2f",income);
+        String tExpenses = String.format("%.2f",expenses);
+        Log.d("Running",tExpenses);
+        Log.d("Running2", transactionList.toString());
+
+        totalIncome.setText("$"+tIncome);
+        totalExpenses.setText("$"+tExpenses);
     }
 
 
