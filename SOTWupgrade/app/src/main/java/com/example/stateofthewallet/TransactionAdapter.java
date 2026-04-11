@@ -5,7 +5,6 @@ package com.example.stateofthewallet;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Color;
-import android.hardware.camera2.CaptureRequest;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,7 +13,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.stateofthewallet.data.model.Transaction;
@@ -22,6 +20,7 @@ import com.example.stateofthewallet.data.model.Transaction;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -39,10 +38,12 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
         this.transactionList = tList;
         this.masterList = new ArrayList<>(tList);   //Fix:  wasn't here
     }
-
-    public void isNotDeposit(Transaction i ){
-        i.isDeposit();
-    }
+    public boolean isNotDeposit(Transaction i ){
+        if (i.isDeposit()){
+            return false;
+        }else {
+        return true;
+    }}
 
 
     public class TransactionViewHolder extends RecyclerView.ViewHolder{
@@ -74,7 +75,7 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
 
     @NonNull
     @Override
-    public TransactionAdapter.TransactionViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public TransactionViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         //This says which xml files are for the recyclerView
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_evidence,parent,false);
         return new TransactionViewHolder(view);
@@ -83,7 +84,7 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
     //Method to insert data into our cards
     @SuppressLint("ResourceAsColor")
     @Override
-    public void onBindViewHolder(@NonNull TransactionAdapter.TransactionViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull TransactionViewHolder holder, int position) {
         Transaction t = transactionList.get(position);
         holder.containerView.setTag(t);   //containerView is a field variable for our holder
 
@@ -141,10 +142,31 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
                 list.sort(Comparator.comparingLong(Transaction::getDateTimestamp)); //compare using the getDateTimestamp
                 break;
             //TODO:  Amount hi vs lo and lo vs hi
+            //from chatGPT to understand how to sort doubles from firebase
             case 2:
-                list.sort(Comparator.comparing(Transaction::getAmount));
+                list.sort((t1,t2) -> Double.compare(t2.getAmount(),t1.getAmount()));
+           case 3:
+               list.sort(Comparator.comparingDouble(Transaction::getAmount).reversed());
         }
     }
+
+    //private void applyFilter(List<Transaction> list){
+    //    if(currentFilterMode == 1){  //Deposits Only
+    //        list.stream().filter(Transaction::isDeposit).collect(Collectors.toList());
+    //    } else if (currentFilterMode ==2) {
+    //        // chatgpt to find charges by finding if deposit is false
+    //        list.stream().filter(t->!t.isDeposit()).collect(Collectors.toList());
+    //    }
+     //   else{
+     //       try {
+    //            list = masterList.stream().collect(Collectors.toList());
+     //       } catch (Exception e) {
+     //           list = new ArrayList<>(masterList);
+      //      }
+      //  }
+   // }
+
+
     //updates the sorting mode and refreshes the current list
     public void setSortMode(int sortMode){
         this.currentSortMode = sortMode;
@@ -157,21 +179,24 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
 
     private void refreshView() {
         if (masterList == null) return;
-
         //1.  apply a filter
         List<Transaction> processedList;
+
+        //applyFilter(processedList);
         if(currentFilterMode == 1){  //Deposits Only
             processedList = masterList.stream().filter(Transaction::isDeposit).collect(Collectors.toList());
         } else if (currentFilterMode ==2) {
-            processedList = masterList.stream().filter(Transaction::isDeposit).collect(Collectors.toList());
+            // chatgpt to find charges by finding if deposit is false
+            processedList = masterList.stream().filter(t->!t.isDeposit()).collect(Collectors.toList());
         }
-        else{
-            try {
+       else{
+           try {
                 processedList = masterList.stream().collect(Collectors.toList());
-            } catch (Exception e) {
-                processedList = new ArrayList<>(masterList);
-            }
-        }
+           } catch (Exception e) {
+               processedList = new ArrayList<>(masterList);
+          }
+      }
+
         //2.  apply sort
         applySort(processedList);
         //3.  update the adapter's display list

@@ -1,6 +1,7 @@
 package com.example.stateofthewallet;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
@@ -32,8 +33,8 @@ public class MainActivity extends AppCompatActivity {
 
     private static TextView totalExpenses;
 
-    private TextView statusTxt;
-
+    private static TextView statusTxt;
+    private TextView welcomeMsg;
 
 
     private static List<Transaction> transactionList;
@@ -44,6 +45,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setSupportActionBar(findViewById(R.id.toolbar));
+
+
+
+        //getSupportActionBar().setTitle("Welcome " + username);
 
         transactionList = new ArrayList<>();
 
@@ -97,6 +102,14 @@ public class MainActivity extends AppCompatActivity {
         }
         String tIncome = String.format("%.2f",income);
         String tExpenses = String.format("%.2f",expenses);
+        if (income>expenses){
+            statusTxt.setTextColor(Color.parseColor("#00FF00"));
+            statusTxt.setText("Fiscal Stability Maintained");
+        }else {
+            statusTxt.setTextColor(Color.parseColor("#FF0000"));
+            statusTxt.setText("Unexplained Surplus Detected");
+        }
+
         Log.d("Running",tExpenses);
         Log.d("Running2", transactionList.toString());
 
@@ -140,6 +153,10 @@ public class MainActivity extends AppCompatActivity {
             adapter.setSortMode(0);
         }else if(id == R.id.sort_oldest){
             adapter.setSortMode(1);
+        } else if (id == R.id.sort_amount_acend) {
+            adapter.setSortMode(2);
+        } else if (id == R.id.sort_amount_decend) {
+            adapter.setSortMode(3);
         }
 
         //todo: implement the rest of the items in the menu
