@@ -169,8 +169,10 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
             //from chatGPT to understand how to sort doubles from firebase
             case 2:
                 list.sort((t1,t2)-> Double.compare(t1.getAmount(),t2.getAmount()));
-           case 3:
-               list.sort(Comparator.comparingDouble(Transaction::getAmount).reversed());
+                break;
+            case 3:
+                list.sort(Comparator.comparingDouble(Transaction::getAmount).reversed());
+                break;
         }
     }
 

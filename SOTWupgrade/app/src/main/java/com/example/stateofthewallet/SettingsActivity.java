@@ -9,12 +9,13 @@ import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import com.example.stateofthewallet.data.model.LoggedInUser;
 
 import com.example.stateofthewallet.data.model.Transaction;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 
-public class Settings extends AppCompatActivity {
+public class SettingsActivity extends AppCompatActivity {
 
     private TextInputEditText newPassword;
     private TextInputEditText newUsername;
@@ -35,7 +36,7 @@ public class Settings extends AppCompatActivity {
         newPassword = findViewById(R.id.newPassword);
         newUsername = findViewById(R.id.newUsername);
 
-        darkLightMode = findViewById(R.id.darkOrLight);
+       // darkLightMode = findViewById(R.id.darkOrLight);
 
         authManager = new AuthManager();
         saveBtn = findViewById(R.id.savestuff);
@@ -43,21 +44,19 @@ public class Settings extends AppCompatActivity {
         exitbtn = findViewById(R.id.exit);
 
 
-       // saveBtn.setOnClickListener(new View.OnClickListener() {
-       //     @Override
-       //     public void onClick(View v) {
-      //          String username = newUsername.getText().toString();
-      //          String password = newPassword.getText().toString();
-      //          if (authManager.passwordCheck(password)){
-      //
-      //          }
-      //              else{}
-      //      }
-      //  });
 
-        if (darkLightMode.isActivated()){
+     saveBtn.setOnClickListener(new View.OnClickListener() {
+         @Override
+         public void onClick(View v) {
+             String un = newUsername.getText().toString();
+             String pw = newPassword.getText().toString();
+             if (authManager.passwordCheck(pw)){
+             //    setDisplayName(un);
+                 FirebaseAuth.getInstance().getCurrentUser().updatePassword(pw);
+             }
+         }
+     });
 
-        }
 
 
 

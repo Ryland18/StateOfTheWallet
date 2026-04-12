@@ -3,7 +3,6 @@ package com.example.stateofthewallet;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -14,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.stateofthewallet.data.model.LoggedInUser;
 import com.example.stateofthewallet.data.model.Transaction;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
@@ -47,9 +47,10 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(findViewById(R.id.toolbar));
 
 
-
-        //getSupportActionBar().setTitle("Welcome " + username);
-
+        if (FirebaseAuth.getInstance().getCurrentUser().getDisplayName() == null){}
+        else {
+            getSupportActionBar().setTitle("Welcome " + FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
+        }
         transactionList = new ArrayList<>();
 
         rvEvidenceStream = findViewById(R.id.rvEvidenceStream);
@@ -132,7 +133,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (id==R.id.action_settings){
             //TODO: navigate to settings page
-            Intent i = new Intent(MainActivity.this, Settings.class);
+            Intent i = new Intent(MainActivity.this, SettingsActivity.class);
             startActivity(i);
             return true;
         } else if (id==R.id.filter_all) {

@@ -19,6 +19,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.zip.Inflater;
 
 public class CRUDManager {
@@ -54,6 +55,16 @@ public class CRUDManager {
         if(fbid !=null){
             t.setId(fbid);
             currentRef.child(fbid).setValue(t).addOnCompleteListener(task -> {
+                //if(t.isDeposit()) {
+                //    KonfettiView konfettiView = findViewById(R.id.);
+
+                //    konfettiView.start(
+                //            new Party(
+                //                    0f, 0f,
+                //                    new Emitter(5, TimeUnit.SECONDS).perSecond(50)
+                //            )
+                //    );
+                //}
                 if (task.isSuccessful()){
                     callback.onComplete(true,null);
 
@@ -119,9 +130,9 @@ public class CRUDManager {
         //from Stack Overflow on confermation pop-up https://stackoverflow.com/questions/36747369/how-to-show-a-pop-up-in-android-studio-to-confirm-an-order
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setCancelable(true);
-        builder.setTitle("Title");
-        builder.setMessage("Message");
-        builder.setPositiveButton("Confirm",
+        builder.setTitle("Confirm Deletion");
+        builder.setMessage("Are you sure you want to delete this transaction?");
+        builder.setPositiveButton("Yes",
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -136,7 +147,7 @@ public class CRUDManager {
 
                     }
                 });
-        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
             }

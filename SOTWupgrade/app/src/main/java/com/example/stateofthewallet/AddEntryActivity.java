@@ -183,6 +183,7 @@ public class AddEntryActivity extends AppCompatActivity {
             @Override
             public void onComplete(boolean success, String errorMessage) {
                 if(success) {
+
                     Intent i = new Intent(AddEntryActivity.this, MainActivity.class);
                     startActivity(i);
                 } else{
