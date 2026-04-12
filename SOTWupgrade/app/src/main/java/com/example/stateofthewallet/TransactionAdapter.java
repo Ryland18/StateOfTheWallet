@@ -2,6 +2,8 @@ package com.example.stateofthewallet;
 
 
 
+import static android.content.ContentValues.TAG;
+
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Color;
@@ -9,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -50,6 +53,7 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
 
         public CardView containerView;   //CardView because the layout of a card is a CardView
         TextView tvVendor, tvDate, tvAmount;
+        Button tvDeleteBtn;
         View vIndicator;
         //This is where you can connect java to the widgets of item_evidence
         //  and give them functions and do stuff with them
@@ -59,6 +63,7 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
             tvDate = itemView.findViewById(R.id.tvRowDate);
             tvAmount = itemView.findViewById(R.id.tvRowAmount);
             vIndicator = itemView.findViewById(R.id.vIndicator);
+            tvDeleteBtn = itemView.findViewById(R.id.tvDeleteBTn);
             containerView = itemView.findViewById(R.id.transaction_card_layout);
             containerView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -70,6 +75,25 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
                     view.getContext().startActivity(i);   //view.getContext() is cuz intent has it
                 }
             });
+
+          //  tvDeleteBtn.setOnClickListener(new View.OnClickListener() {
+          //      @Override
+          //      public void onClick(View v) {
+          //          Transaction t = (Transaction) containerView.getTag();
+          //          CRUDManager.deleteTransaction(t, this,new CRUDManager.CrudCallback() {
+          //              @Override
+          //              public void onComplete(boolean success, String errorMessage) {
+          //                  if (success){
+
+          //                  }
+            //                else {
+
+          //                  }
+          //              }
+          //          });
+          //      }
+           // });
+
         }
     }
 
@@ -144,27 +168,30 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
             //TODO:  Amount hi vs lo and lo vs hi
             //from chatGPT to understand how to sort doubles from firebase
             case 2:
-                list.sort((t1,t2) -> Double.compare(t2.getAmount(),t1.getAmount()));
+                list.sort((t1,t2)-> Double.compare(t1.getAmount(),t2.getAmount()));
            case 3:
                list.sort(Comparator.comparingDouble(Transaction::getAmount).reversed());
         }
     }
 
-    //private void applyFilter(List<Transaction> list){
-    //    if(currentFilterMode == 1){  //Deposits Only
-    //        list.stream().filter(Transaction::isDeposit).collect(Collectors.toList());
-    //    } else if (currentFilterMode ==2) {
-    //        // chatgpt to find charges by finding if deposit is false
-    //        list.stream().filter(t->!t.isDeposit()).collect(Collectors.toList());
-    //    }
-     //   else{
-     //       try {
-    //            list = masterList.stream().collect(Collectors.toList());
-     //       } catch (Exception e) {
-     //           list = new ArrayList<>(masterList);
-      //      }
-      //  }
-   // }
+    private List<Transaction> applyFilter(){
+        List<Transaction> list;
+        if(currentFilterMode == 1){  //Deposits Only
+            list = masterList.stream().filter(Transaction::isDeposit).collect(Collectors.toList());
+        } else if (currentFilterMode ==2) {
+            // chatgpt to find charges by finding if deposit is false
+            Log.d(TAG, "applyFilter: Charges");
+            list = masterList.stream().filter(t->!t.isDeposit()).collect(Collectors.toList());
+        }
+        else{
+            try {
+                list = masterList.stream().collect(Collectors.toList());
+            } catch (Exception e) {
+                list = new ArrayList<>(masterList);
+            }
+        }
+        return list;
+    }
 
 
     //updates the sorting mode and refreshes the current list
@@ -180,22 +207,22 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
     private void refreshView() {
         if (masterList == null) return;
         //1.  apply a filter
-        List<Transaction> processedList;
+        List<Transaction> processedList = applyFilter();
 
         //applyFilter(processedList);
-        if(currentFilterMode == 1){  //Deposits Only
-            processedList = masterList.stream().filter(Transaction::isDeposit).collect(Collectors.toList());
-        } else if (currentFilterMode ==2) {
+    //    if(currentFilterMode == 1){  //Deposits Only
+    //        processedList = masterList.stream().filter(Transaction::isDeposit).collect(Collectors.toList());
+    //    } else if (currentFilterMode ==2) {
             // chatgpt to find charges by finding if deposit is false
-            processedList = masterList.stream().filter(t->!t.isDeposit()).collect(Collectors.toList());
-        }
-       else{
-           try {
-                processedList = masterList.stream().collect(Collectors.toList());
-           } catch (Exception e) {
-               processedList = new ArrayList<>(masterList);
-          }
-      }
+    //        processedList = masterList.stream().filter(t->!t.isDeposit()).collect(Collectors.toList());
+    //    }
+    //   else{
+    //       try {
+    //            processedList = masterList.stream().collect(Collectors.toList());
+    //       } catch (Exception e) {
+     //          processedList = new ArrayList<>(masterList);
+     //     }
+     // }
 
         //2.  apply sort
         applySort(processedList);

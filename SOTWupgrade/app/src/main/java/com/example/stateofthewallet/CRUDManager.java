@@ -1,7 +1,11 @@
 package com.example.stateofthewallet;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.util.Log;
+import android.view.LayoutInflater;
 
 import androidx.annotation.NonNull;
 
@@ -15,6 +19,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.zip.Inflater;
 
 public class CRUDManager {
     /* 4 main functions of SQL or mainly any database structure
@@ -105,17 +110,39 @@ public class CRUDManager {
 
     //////////////Delete //////////////////////////////////
 
-    public void deleteTransaction(Transaction t, CrudCallback crudCallback){
+    public static void deleteTransaction(Transaction t, Context context, CrudCallback crudCallback){
         // set t into the existing place
         //database look at                 transaction subnode ID         remove it             work or not
-        databaseReference.child("transactions").child(t.getId()).removeValue().addOnCompleteListener(task -> {
-            if (task.isSuccessful()){
-                crudCallback.onComplete(true,null);
-            }
-            else {
-                crudCallback.onComplete(false,task.getException().getMessage());
+        // Source - https://stackoverflow.com/a/36747528
+// Posted by Dus
+// Retrieved 2026-04-11, License - CC BY-SA 3.0
+        //from Stack Overflow on confermation pop-up https://stackoverflow.com/questions/36747369/how-to-show-a-pop-up-in-android-studio-to-confirm-an-order
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setCancelable(true);
+        builder.setTitle("Title");
+        builder.setMessage("Message");
+        builder.setPositiveButton("Confirm",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        databaseReference.child("transactions").child(t.getId()).removeValue().addOnCompleteListener(task -> {
+                            if (task.isSuccessful()){
+                                crudCallback.onComplete(true,null);
+                            }
+                            else {
+                                crudCallback.onComplete(false,task.getException().getMessage());
+                            }
+                        });
+
+                    }
+                });
+        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
             }
         });
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
 

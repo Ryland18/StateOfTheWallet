@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="12dp"
@@ -29,18 +30,18 @@
         <!-- Principal Suspect (Vendor) -->
         <TextView
             android:id="@+id/tvRowSuspect"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_width="190dp"
+            android:layout_height="19dp"
             android:layout_marginStart="12dp"
+            android:layout_marginEnd="8dp"
+            android:fontFamily="monospace"
             android:text="SUSPECT: STARBUCKS"
             android:textColor="#FFFFFF"
             android:textSize="14sp"
             android:textStyle="bold"
-            android:fontFamily="monospace"
+            app:layout_constraintEnd_toEndOf="@+id/tvRowAmount"
             app:layout_constraintStart_toEndOf="@id/vIndicator"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/tvRowAmount"
-            android:layout_marginEnd="8dp"/>
+            app:layout_constraintTop_toTopOf="parent" />
 
         <!-- Date of Incident -->
         <TextView
@@ -66,10 +67,23 @@
             android:textSize="16sp"
             android:textStyle="bold"
             android:fontFamily="monospace"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvRowSuspect"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintStart_toEndOf="@id/tvRowDate"
+            app:layout_constraintEnd_toStartOf="@id/tvDeleteBTn"/>
 
+        <Button
+            android:id="@+id/tvDeleteBTn"
+            android:layout_width="70dp"
+            android:layout_height="wrap_content"
+            android:fontFamily="monospace"
+            android:text="🗑️"
+            android:textColor="#CF6679"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 
