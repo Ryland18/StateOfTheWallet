@@ -29,13 +29,16 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView rvEvidenceStream;
     private TransactionAdapter adapter;
 
-    private static TextView totalIncome;
+    static TextView totalIncome;
 
-    private static TextView totalExpenses;
+    static TextView totalExpenses;
 
-    private static TextView statusTxt;
+    static TextView statusTxt;
     private TextView welcomeMsg;
 
+
+    static double income = 0;
+    static double expenses = 0;
 
     private static List<Transaction> transactionList;
     private TextView tvTotalIncome, tvTotalExpenses, tvNetStatus;
@@ -47,10 +50,12 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(findViewById(R.id.toolbar));
 
 
-        if (FirebaseAuth.getInstance().getCurrentUser().getDisplayName() == null){}
-        else {
-            getSupportActionBar().setTitle("Welcome " + FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
-        }
+       // if (FirebaseAuth.getInstance().getCurrentUser().getDisplayName().toString() == null){
+       //     getSupportActionBar().setTitle("Welcome User");
+       // }
+       // else {
+       //     getSupportActionBar().setTitle("Welcome " + FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
+        // }
         transactionList = new ArrayList<>();
 
         rvEvidenceStream = findViewById(R.id.rvEvidenceStream);
@@ -89,34 +94,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public static void briefingStats() {
 
-        double income = 0;
-        double expenses = 0;
-
-        for (int i = 0; i<transactionList.size();i++){
-            if (transactionList.get(i).isDeposit()) {
-                income += transactionList.get(i).getAmount();
-            }else{
-                expenses += transactionList.get(i).getAmount();
-            }
-        }
-        String tIncome = String.format("%.2f",income);
-        String tExpenses = String.format("%.2f",expenses);
-        if (income>expenses){
-            statusTxt.setTextColor(Color.parseColor("#00FF00"));
-            statusTxt.setText("Fiscal Stability Maintained");
-        }else {
-            statusTxt.setTextColor(Color.parseColor("#FF0000"));
-            statusTxt.setText("Unexplained Surplus Detected");
-        }
-
-        Log.d("Running",tExpenses);
-        Log.d("Running2", transactionList.toString());
-
-        totalIncome.setText("$"+tIncome);
-        totalExpenses.setText("$"+tExpenses);
-    }
 
 
     @Override

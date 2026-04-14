@@ -4,6 +4,12 @@ package com.example.stateofthewallet;
 
 import static android.content.ContentValues.TAG;
 
+import static com.example.stateofthewallet.MainActivity.expenses;
+import static com.example.stateofthewallet.MainActivity.income;
+import static com.example.stateofthewallet.MainActivity.statusTxt;
+import static com.example.stateofthewallet.MainActivity.totalExpenses;
+import static com.example.stateofthewallet.MainActivity.totalIncome;
+
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Color;
@@ -146,6 +152,7 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
 //                transactions.sort((t1,t2) -> Long.compare(t2.getDateTimestamp(),t1.getDateTimestamp()));
 
                 masterList = new ArrayList<>(transactions);
+                Log.d("False Issue - importFirebaseData", String.valueOf(masterList));
 //                transactionList = transactions;   //transactionList is the global variable of this file
 //                notifyDataSetChanged();  //"refresh" the recyclerview
                 refreshView();
@@ -231,7 +238,33 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
         //3.  update the adapter's display list
         transactionList=processedList;
         notifyDataSetChanged();
-        MainActivity.briefingStats();
+        briefingStats();
+    }
+
+    public void briefingStats() {
+
+        for (int i = 0; i<transactionList.size(); i++){
+            if (transactionList.get(i).isDeposit()) {
+                income += transactionList.get(i).getAmount();
+            }else{
+                expenses += transactionList.get(i).getAmount();
+            }
+        }
+        String tIncome = String.format("%.2f",income);
+        String tExpenses = String.format("%.2f",expenses);
+        if (income>expenses){
+            statusTxt.setTextColor(Color.parseColor("#00FF00"));
+            statusTxt.setText("Fiscal Stability Maintained");
+        }else {
+            statusTxt.setTextColor(Color.parseColor("#FF0000"));
+            statusTxt.setText("Unexplained Surplus Detected");
+        }
+
+        Log.d("Running", String.valueOf(expenses));
+        Log.d("Running2", String.valueOf(transactionList));
+
+        totalIncome.setText("$"+tIncome);
+        totalExpenses.setText("$"+tExpenses);
     }
 }
 

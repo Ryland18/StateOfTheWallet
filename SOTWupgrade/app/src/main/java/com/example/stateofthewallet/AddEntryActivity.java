@@ -87,7 +87,7 @@ public class AddEntryActivity extends AppCompatActivity {
         }
         else {
             existing = true;
-            etVendor.setText(grabbed.getVendor());
+            etVendor.setText(capBetweenSpacing(grabbed.getVendor()));
             etDamages.setText(String.valueOf(grabbed.getAmount()));
             etNotes.setText(grabbed.getNotes());
             tbIsDeposit.setChecked(grabbed.isDeposit());
@@ -114,7 +114,16 @@ public class AddEntryActivity extends AppCompatActivity {
             }
     );
 
+    // from geeks for greeks on capitolizing words after spacing https://www.geeksforgeeks.org/java/java-program-to-capitalize-the-first-letter-of-each-word-in-a-string/
+    public static String capBetweenSpacing(String input){
+            String [] words = input.split("\\s");
+            StringBuilder newString = new StringBuilder();
 
+            for (String word: words){
+                newString.append(Character.toTitleCase(word.charAt(0))).append(word.substring(1)).append(" ");
+            }
+            return newString.toString().trim();
+    }
 
 
 
@@ -131,11 +140,13 @@ public class AddEntryActivity extends AppCompatActivity {
         tvDateDisplay.setText("INCIDENT DADTE: "+dateStr+" (SYSTEM SECURE)" );
     }
     private void reportTransaction() {
-        String vendorName = etVendor.getText().toString();
+        String vendorName = capBetweenSpacing(etVendor.getText().toString());
         String amountStr = etDamages.getText().toString();
         try{
             double amountValue = Double.parseDouble(amountStr);
-            boolean isDeposit = tbIsDeposit.isActivated();
+            double fixedAmount = Double.parseDouble(String.format("%.2f",amountValue));
+            boolean isDeposit = tbIsDeposit.isChecked();  //TODO: DOUBLE CHECK THIS?????????
+            Log.d("false issue - isDeposit", String.valueOf(isDeposit));
 
             /* --- CLOUD STORAGE MISSION BRIEFING ---
             If we were using Firebase Storage (Paid/Spark limits), the logic would be:
@@ -151,7 +162,7 @@ public class AddEntryActivity extends AppCompatActivity {
             */
 
 
-
+            if(etNotes.getText().length()<30){
             if (existing){
                 Transaction t = new Transaction(
                         grabbed.getId(),vendorName,
@@ -170,6 +181,7 @@ public class AddEntryActivity extends AppCompatActivity {
                         selectedDate);
                 writeNewTransaction(t);
                 Log.d("reportTransaction", String.valueOf(t));
+            }
             }
 
         }catch(NumberFormatException e){

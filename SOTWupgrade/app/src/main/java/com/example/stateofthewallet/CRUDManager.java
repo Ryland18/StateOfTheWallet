@@ -91,7 +91,7 @@ public class CRUDManager {
                 }
                 //Place it where you need it
                 transactionList = snapShotTransactions;   //pushing our data to a global variable in this file
-                Log.d(TAG, String.valueOf(transactionList));
+                Log.d("False Issue - readAllTransaction", String.valueOf(transactionList));
                 callback.onTransactionsLoaded(snapShotTransactions);   //using the interface to pull the tList
             }
 
