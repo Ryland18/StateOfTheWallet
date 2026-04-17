@@ -86,12 +86,11 @@
                     android:inputType="numberDecimal" />
             </com.google.android.material.textfield.TextInputLayout>
             <!-- IO Toggle  -->
-            <ToggleButton
+            <Switch
                 android:id="@+id/darkOrLight"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textOn="Light Mode"
-                android:textOff="Dark Mode"
+                android:text="Dark Mode"
                 android:textColor="#FFF"
                 android:backgroundTint="#1E1E1E"
                 android:fontFamily="monospace"
