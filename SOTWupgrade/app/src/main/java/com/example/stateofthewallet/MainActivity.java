@@ -1,5 +1,7 @@
 package com.example.stateofthewallet;
 
+import static android.content.ContentValues.TAG;
+
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -41,21 +43,25 @@ public class MainActivity extends AppCompatActivity {
     static double expenses = 0;
 
     private static List<Transaction> transactionList;
-    private TextView tvTotalIncome, tvTotalExpenses, tvNetStatus;
+    private TextView tvTotalIncome, tvTotalExpenses, tvNetStatus, overview;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setSupportActionBar(findViewById(R.id.toolbar));
-
-
-       // if (FirebaseAuth.getInstance().getCurrentUser().getDisplayName().toString() == null){
-       //     getSupportActionBar().setTitle("Welcome User");
-       // }
-       // else {
-       //     getSupportActionBar().setTitle("Welcome " + FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
-        // }
+        overview = findViewById(R.id.overview);
+    try{
+        Log.d("ContentValues", String.valueOf(FirebaseAuth.getInstance().getCurrentUser()));
+        if (FirebaseAuth.getInstance().getCurrentUser().getDisplayName() == null){
+            overview.setText("Welcome User");
+        }
+        else {
+            overview.setText("Welcome " + FirebaseAuth.getInstance().getCurrentUser().getDisplayName().toString());
+         }
+    }catch (Exception e){
+        Log.d(TAG, e.getMessage());
+    }
         transactionList = new ArrayList<>();
 
         rvEvidenceStream = findViewById(R.id.rvEvidenceStream);

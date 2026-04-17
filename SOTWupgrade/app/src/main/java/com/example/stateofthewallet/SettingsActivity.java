@@ -58,7 +58,7 @@ public class SettingsActivity extends AppCompatActivity {
         exitbtn = findViewById(R.id.exit);
 
         SharedPreferences sharedPreferences = getSharedPreferences("darkMode", MODE_PRIVATE);
-        darkLightMode.setChecked(sharedPreferences.getBoolean("isDarkMode", true));
+        darkLightMode.setChecked(sharedPreferences.getBoolean("isDarkMode", false));
 
 
         darkLightMode.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -78,8 +78,7 @@ public class SettingsActivity extends AppCompatActivity {
                 String un = newUsername.getText().toString();
                 String pw = newPassword.getText().toString();
                 if (authManager.passwordCheck(pw)){
-                    //    setDisplayName(un);
-
+                   //FirebaseAuth.getInstance().getCurrentUser().updateDisplayName();
                     FirebaseAuth.getInstance().getCurrentUser().updatePassword(pw);
                 }
             }
