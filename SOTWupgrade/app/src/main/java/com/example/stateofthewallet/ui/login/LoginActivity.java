@@ -13,6 +13,7 @@ import com.example.stateofthewallet.MainActivity;
 import com.example.stateofthewallet.R;
 import com.google.android.material.snackbar.Snackbar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -25,6 +26,10 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        
+        // Apply saved theme preference
+        applyThemePreference();
+        
         setContentView(R.layout.activity_login);
 
         loginBTN = findViewById(R.id.btnLogin);
@@ -83,5 +88,17 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    // Apply theme preference from SharedPreferences
+    private void applyThemePreference() {
+        boolean isDarkMode = getSharedPreferences("darkMode", MODE_PRIVATE)
+            .getBoolean("isDarkMode", false);
+        
+        if (isDarkMode) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        }
     }
 }

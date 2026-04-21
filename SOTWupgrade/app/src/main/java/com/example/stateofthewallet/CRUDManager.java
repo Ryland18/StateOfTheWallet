@@ -1,7 +1,11 @@
 package com.example.stateofthewallet;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.util.Log;
+import android.view.LayoutInflater;
 
 import androidx.annotation.NonNull;
 
@@ -15,6 +19,8 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.zip.Inflater;
 
 public class CRUDManager {
     /* 4 main functions of SQL or mainly any database structure
@@ -49,6 +55,16 @@ public class CRUDManager {
         if(fbid !=null){
             t.setId(fbid);
             currentRef.child(fbid).setValue(t).addOnCompleteListener(task -> {
+                //if(t.isDeposit()) {
+                //    KonfettiView konfettiView = findViewById(R.id.);
+
+                //    konfettiView.start(
+                //            new Party(
+                //                    0f, 0f,
+                //                    new Emitter(5, TimeUnit.SECONDS).perSecond(50)
+                //            )
+                //    );
+                //}
                 if (task.isSuccessful()){
                     callback.onComplete(true,null);
 
@@ -75,7 +91,7 @@ public class CRUDManager {
                 }
                 //Place it where you need it
                 transactionList = snapShotTransactions;   //pushing our data to a global variable in this file
-                Log.d(TAG, String.valueOf(transactionList));
+                Log.d("False Issue - readAllTransaction", String.valueOf(transactionList));
                 callback.onTransactionsLoaded(snapShotTransactions);   //using the interface to pull the tList
             }
 
@@ -105,17 +121,39 @@ public class CRUDManager {
 
     //////////////Delete //////////////////////////////////
 
-    public void deleteTransaction(Transaction t, CrudCallback crudCallback){
+    public static void deleteTransaction(Transaction t, Context context, CrudCallback crudCallback){
         // set t into the existing place
         //database look at                 transaction subnode ID         remove it             work or not
-        databaseReference.child("transactions").child(t.getId()).removeValue().addOnCompleteListener(task -> {
-            if (task.isSuccessful()){
-                crudCallback.onComplete(true,null);
-            }
-            else {
-                crudCallback.onComplete(false,task.getException().getMessage());
+        // Source - https://stackoverflow.com/a/36747528
+// Posted by Dus
+// Retrieved 2026-04-11, License - CC BY-SA 3.0
+        //from Stack Overflow on confermation pop-up https://stackoverflow.com/questions/36747369/how-to-show-a-pop-up-in-android-studio-to-confirm-an-order
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setCancelable(true);
+        builder.setTitle("Confirm Deletion");
+        builder.setMessage("Are you sure you want to delete this transaction?");
+        builder.setPositiveButton("Yes",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        databaseReference.child("transactions").child(t.getId()).removeValue().addOnCompleteListener(task -> {
+                            if (task.isSuccessful()){
+                                crudCallback.onComplete(true,null);
+                            }
+                            else {
+                                crudCallback.onComplete(false,task.getException().getMessage());
+                            }
+                        });
+
+                    }
+                });
+        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
             }
         });
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
 

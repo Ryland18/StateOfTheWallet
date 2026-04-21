@@ -1,12 +1,23 @@
 package com.example.stateofthewallet;
 
 
+
+import static android.content.ContentValues.TAG;
+
+import static com.example.stateofthewallet.MainActivity.expenses;
+import static com.example.stateofthewallet.MainActivity.income;
+import static com.example.stateofthewallet.MainActivity.statusTxt;
+import static com.example.stateofthewallet.MainActivity.totalExpenses;
+import static com.example.stateofthewallet.MainActivity.totalIncome;
+
+import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.hardware.camera2.CaptureRequest;
+import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -14,10 +25,12 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.stateofthewallet.data.model.Transaction;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -35,16 +48,19 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
         this.transactionList = tList;
         this.masterList = new ArrayList<>(tList);   //Fix:  wasn't here
     }
-
-    public void isNotDeposit(Transaction i ){
-        i.isDeposit();
-    }
+    public boolean isNotDeposit(Transaction i ){
+        if (i.isDeposit()){
+            return false;
+        }else {
+        return true;
+    }}
 
 
     public class TransactionViewHolder extends RecyclerView.ViewHolder{
 
         public CardView containerView;   //CardView because the layout of a card is a CardView
         TextView tvVendor, tvDate, tvAmount;
+        Button tvDeleteBtn;
         View vIndicator;
         //This is where you can connect java to the widgets of item_evidence
         //  and give them functions and do stuff with them
@@ -54,7 +70,10 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
             tvDate = itemView.findViewById(R.id.tvRowDate);
             tvAmount = itemView.findViewById(R.id.tvRowAmount);
             vIndicator = itemView.findViewById(R.id.vIndicator);
+            tvDeleteBtn = itemView.findViewById(R.id.tvDeleteBTn);
             containerView = itemView.findViewById(R.id.transaction_card_layout);
+            
+            // Single click - edit transaction
             containerView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -65,20 +84,49 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
                     view.getContext().startActivity(i);   //view.getContext() is cuz intent has it
                 }
             });
+            
+            // Long click - delete transaction
+            containerView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    Transaction t = (Transaction) containerView.getTag();
+                    
+                    new MaterialAlertDialogBuilder(v.getContext())
+                        .setTitle("CONFIRM DESTRUCTION")
+                        .setMessage("Delete this transaction? This action cannot be undone.")
+                        .setPositiveButton("DELETE", (dialog, which) -> {
+                            CRUDManager.deleteTransaction(t, v.getContext(), new CRUDManager.CrudCallback() {
+                                @Override
+                                public void onComplete(boolean success, String errorMessage) {
+                                    if (success) {
+                                        // Remove from masterList and refresh
+                                        masterList.remove(t);
+                                        refreshView();
+                                    }
+                                }
+                            });
+                        })
+                        .setNegativeButton("CANCEL", (dialog, which) -> dialog.dismiss())
+                        .show();
+                    
+                    return true;
+                }
+            });
         }
     }
 
     @NonNull
     @Override
-    public TransactionAdapter.TransactionViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public TransactionViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         //This says which xml files are for the recyclerView
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_evidence,parent,false);
         return new TransactionViewHolder(view);
     }
 
     //Method to insert data into our cards
+    @SuppressLint("ResourceAsColor")
     @Override
-    public void onBindViewHolder(@NonNull TransactionAdapter.TransactionViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull TransactionViewHolder holder, int position) {
         Transaction t = transactionList.get(position);
         holder.containerView.setTag(t);   //containerView is a field variable for our holder
 
@@ -87,10 +135,18 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
         SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy", Locale.US);
         holder.tvDate.setText("Date: "+sdf.format(new Date(t.getDateTimestamp())));
 
-        //TODO: need to be sure only 2 decimals...
-        holder.tvAmount.setText("$ "+t.getAmount());
+        // Format amount to exactly 2 decimals
+        holder.tvAmount.setText("$ "+String.format("%.2f",t.getAmount()));
 
-        //TODO: change the text color based on income or outcome
+        // Change the text color and indicator based on income or outcome
+        Log.d("Calling",String.valueOf(t.isDeposit()));
+        if (t.isDeposit()) {
+            holder.tvAmount.setTextColor(Color.parseColor("#4CAF50"));  // Green for deposits
+            holder.vIndicator.setBackgroundColor(Color.parseColor("#4CAF50"));
+        } else {
+            holder.tvAmount.setTextColor(Color.parseColor("#CF6679"));  // Red for expenses
+            holder.vIndicator.setBackgroundColor(Color.parseColor("#CF6679"));
+        }
 
     }
 
@@ -110,6 +166,7 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
 //                transactions.sort((t1,t2) -> Long.compare(t2.getDateTimestamp(),t1.getDateTimestamp()));
 
                 masterList = new ArrayList<>(transactions);
+                Log.d("False Issue - importFirebaseData", String.valueOf(masterList));
 //                transactionList = transactions;   //transactionList is the global variable of this file
 //                notifyDataSetChanged();  //"refresh" the recyclerview
                 refreshView();
@@ -130,8 +187,36 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
                 list.sort(Comparator.comparingLong(Transaction::getDateTimestamp)); //compare using the getDateTimestamp
                 break;
             //TODO:  Amount hi vs lo and lo vs hi
+            //from chatGPT to understand how to sort doubles from firebase
+            case 2:
+                list.sort((t1,t2)-> Double.compare(t1.getAmount(),t2.getAmount()));
+                break;
+            case 3:
+                list.sort(Comparator.comparingDouble(Transaction::getAmount).reversed());
+                break;
         }
     }
+
+    private List<Transaction> applyFilter(){
+        List<Transaction> list;
+        if(currentFilterMode == 1){  //Deposits Only
+            list = masterList.stream().filter(Transaction::isDeposit).collect(Collectors.toList());
+        } else if (currentFilterMode ==2) {
+            // chatgpt to find charges by finding if deposit is false
+            Log.d(TAG, "applyFilter: Charges");
+            list = masterList.stream().filter(t->!t.isDeposit()).collect(Collectors.toList());
+        }
+        else{
+            try {
+                list = masterList.stream().collect(Collectors.toList());
+            } catch (Exception e) {
+                list = new ArrayList<>(masterList);
+            }
+        }
+        return list;
+    }
+
+
     //updates the sorting mode and refreshes the current list
     public void setSortMode(int sortMode){
         this.currentSortMode = sortMode;
@@ -144,22 +229,70 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
 
     private void refreshView() {
         if (masterList == null) return;
-
         //1.  apply a filter
-        List<Transaction> processedList;
-        if(currentFilterMode == 1){  //Deposits Only
-            processedList = masterList.stream().filter(Transaction::isDeposit).collect(Collectors.toList());
-        } else if (currentFilterMode ==2) {
-            processedList = masterList.stream().filter(Transaction::isDeposit).collect(Collectors.toList());
-        }
-        else{
-            processedList = new ArrayList<>(masterList);
-        }
+        List<Transaction> processedList = applyFilter();
+
+        //applyFilter(processedList);
+    //    if(currentFilterMode == 1){  //Deposits Only
+    //        processedList = masterList.stream().filter(Transaction::isDeposit).collect(Collectors.toList());
+    //    } else if (currentFilterMode ==2) {
+            // chatgpt to find charges by finding if deposit is false
+    //        processedList = masterList.stream().filter(t->!t.isDeposit()).collect(Collectors.toList());
+    //    }
+    //   else{
+    //       try {
+    //            processedList = masterList.stream().collect(Collectors.toList());
+    //       } catch (Exception e) {
+     //          processedList = new ArrayList<>(masterList);
+     //     }
+     // }
+
         //2.  apply sort
         applySort(processedList);
         //3.  update the adapter's display list
         transactionList=processedList;
         notifyDataSetChanged();
+        briefingStats();
+    }
+
+    public void briefingStats() {
+        // CRITICAL FIX: Reset income and expenses before calculating to avoid accumulation
+        double localIncome = 0;
+        double localExpenses = 0;
+
+        for (int i = 0; i<transactionList.size(); i++){
+            if (transactionList.get(i).isDeposit()) {
+                localIncome += transactionList.get(i).getAmount();
+            }else{
+                localExpenses += transactionList.get(i).getAmount();
+            }
+        }
+        
+        // Update the static variables for external access
+        income = localIncome;
+        expenses = localExpenses;
+        
+        String tIncome = String.format("%.2f", localIncome);
+        String tExpenses = String.format("%.2f", localExpenses);
+        
+        // Fiscal Stability Status - Fixed Logic
+        double netBalance = localIncome - localExpenses;
+        if (netBalance > 0) {
+            statusTxt.setTextColor(Color.parseColor("#4CAF50"));  // Green
+            statusTxt.setText("UNEXPLAINED SURPLUS DETECTED");
+        } else if (netBalance < 0) {
+            statusTxt.setTextColor(Color.parseColor("#CF6679"));  // Red
+            statusTxt.setText("FISCAL COLLAPSE IMMINENT");
+        } else {
+            statusTxt.setTextColor(Color.parseColor("#FFC107"));  // Yellow/Amber
+            statusTxt.setText("FISCAL STABILITY MAINTAINED");
+        }
+
+        Log.d("Running", "Expenses: " + localExpenses);
+        Log.d("Running2", "Transaction List Size: " + transactionList.size());
+
+        totalIncome.setText("$"+tIncome);
+        totalExpenses.setText("$"+tExpenses);
     }
 }
 

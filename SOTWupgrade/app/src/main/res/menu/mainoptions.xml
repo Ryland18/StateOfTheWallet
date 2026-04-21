@@ -47,8 +47,12 @@
                 />
 
             <item
-                android:id="@+id/sort_amount_desc"
-                android:title="AMOUNT"
+                android:id="@+id/sort_amount_acend"
+                android:title="Lowest to Highest"
+                />
+            <item
+                android:id="@+id/sort_amount_decend"
+                android:title="Highest to Lowest"
                 />
         </menu>
 

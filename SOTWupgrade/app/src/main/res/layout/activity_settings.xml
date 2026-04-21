@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_primary"
+    tools:context=".Settings"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical"
+    >
+
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/toolbar_background"
+        app:title="SETTINGS"
+        app:titleTextColor="@color/toolbar_title"
+        app:layout_constraintTop_toTopOf="parent"
+        app:popupTheme = "@style/ThemeOverlay.AppCompat.Dark"
+        />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="24dp">
+
+            <!-- Vendor Section  -->
+            <Button
+                android:id="@+id/logout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="230dp"
+                android:layout_marginBottom="34dp"
+                android:text="Logout"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:fontFamily="monospace"
+                android:backgroundTint="@color/color_expense"
+                android:textColor="@color/background_primary"/>
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="New Username"
+                android:textColorHint="@color/text_secondary"
+                app:hintTextColor="@color/toolbar_title"
+                app:boxStrokeColor="@color/toolbar_title"
+                app:startIconTint="@color/text_secondary">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/newUsername"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/text_primary"
+                    android:inputType="textCapWords" />
+            </com.google.android.material.textfield.TextInputLayout>
+            <!-- Password Section  -->
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:hint="New Password"
+                android:textColorHint="@color/text_secondary"
+                app:hintTextColor="@color/toolbar_title"
+                app:boxStrokeColor="@color/toolbar_title"
+                app:passwordToggleEnabled="true">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/newPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/text_primary"
+                    android:inputType="textPassword" />
+            </com.google.android.material.textfield.TextInputLayout>
+            <!-- IO Toggle  -->
+            <Switch
+                android:id="@+id/darkOrLight"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Dark Mode"
+                android:textColor="@color/text_primary"
+                android:backgroundTint="@color/background_secondary"
+                android:fontFamily="monospace"
+                android:checked="false"/>
+            <!-- Date Display -->
+            <Button
+                android:id="@+id/savestuff"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="34dp"
+                android:backgroundTint="@color/color_expense"
+                android:fontFamily="monospace"
+                android:text="Save New Parameters"
+                android:textColor="@color/background_primary"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+            <Button
+                android:id="@+id/exit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="34dp"
+                android:text="Back to Main Menu"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:fontFamily="monospace"
+                android:backgroundTint="@color/color_expense"
+                android:textColor="@color/background_primary"/>
+            <!-- Camera/Evidence Placeholder (Deferred) -->
+
+            <!--  Submission BTN  -->
+
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>
