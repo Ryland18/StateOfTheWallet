@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+<LinearLayout
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#1A1A1A"
+    android:background="@color/background_primary"
     tools:context=".AddEntryActivity"
     android:fitsSystemWindows="true"
     android:orientation="vertical"
@@ -16,9 +22,9 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="#1e1e1e"
+        android:background="@color/toolbar_background"
         app:title="DAMAGE REPORT"
-        app:titleTextColor="#FFd700"
+        app:titleTextColor="@color/toolbar_title"
         app:layout_constraintTop_toTopOf="parent"
         app:popupTheme = "@style/ThemeOverlay.AppCompat.Dark"
         />
@@ -43,7 +49,7 @@
         android:fontFamily="monospace"
         android:textStyle="bold"
         android:textSize="18sp"
-        android:textColor="#FFD700"
+        android:textColor="@color/toolbar_title"
         android:layout_marginBottom="4dp"/>
     <TextView
         android:layout_width="wrap_content"
@@ -51,7 +57,7 @@
         android:text="FISCAL SELF-SABOTAGE IN PROGRESS"
         android:fontFamily="monospace"
         android:textSize="10sp"
-        android:textColor="#888888"
+        android:textColor="@color/text_secondary"
         android:layout_marginBottom="24dp"/>
     <!-- Vendor Section  -->
     <com.google.android.material.textfield.TextInputLayout
@@ -59,17 +65,17 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="       Financial Bully (Vendor)"
-        android:textColorHint="#888888"
-        app:hintTextColor="#FFD700"
-        app:boxStrokeColor="#FFD700"
+        android:textColorHint="@color/text_secondary"
+        app:hintTextColor="@color/toolbar_title"
+        app:boxStrokeColor="@color/toolbar_title"
         app:startIconDrawable="@android:drawable/ic_menu_search"
-        app:startIconTint="#888888">
+        app:startIconTint="@color/text_secondary">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etSuspect"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="#FFFFFF"
+            android:textColor="@color/text_primary"
             android:inputType="textCapWords" />
     </com.google.android.material.textfield.TextInputLayout>
     <!-- Amount Section  -->
@@ -79,17 +85,17 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:hint="Wallet Wound Depth (Amount)"
-        android:textColorHint="#888888"
-        app:hintTextColor="#CF6679"
-        app:boxStrokeColor="#CF6679"
+        android:textColorHint="@color/text_secondary"
+        app:hintTextColor="@color/color_expense"
+        app:boxStrokeColor="@color/color_expense"
         app:prefixText="$"
-        app:prefixTextColor="#CF6679">
+        app:prefixTextColor="@color/color_expense">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etDamages"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="#FFFFFF"
+            android:textColor="@color/text_primary"
             android:inputType="numberDecimal" />
     </com.google.android.material.textfield.TextInputLayout>
     <!-- IO Toggle  -->
@@ -99,8 +105,8 @@
         android:layout_height="wrap_content"
         android:textOn="WALLET REPAIR (INCOME)"
         android:textOff="WALLET DAMAGE (OUTCOME)"
-        android:textColor="#FFF"
-        android:backgroundTint="#1E1E1E"
+        android:textColor="@color/text_primary"
+        android:backgroundTint="@color/background_secondary"
         android:fontFamily="monospace"
         android:checked="false"/>
     <!--  Comments  -->
@@ -109,16 +115,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:hint="Grievance Notes (Comments)"
-        android:textColorHint="#888888"
-        app:hintTextColor="#FFD700"
-        app:boxStrokeColor="#FFD700">
+        android:hint="Grievance Notes (Comments) (less than 30 characters)"
+        android:textColorHint="@color/text_secondary"
+        app:hintTextColor="@color/toolbar_title"
+        app:boxStrokeColor="@color/toolbar_title">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etNotes"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="#FFFFFF"
+            android:textColor="@color/text_primary"
             android:gravity="top"
             android:inputType="textMultiLine"
             android:lines="3" />
@@ -131,10 +137,10 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:text="SELECT DATE"
-        android:textColor="#FFD700"
-        app:strokeColor="#FFD700"
+        android:textColor="@color/toolbar_title"
+        app:strokeColor="@color/toolbar_title"
         app:icon="@android:drawable/ic_menu_today"
-        app:iconTint="#FFD700"/>
+        app:iconTint="@color/toolbar_title"/>
     <TextView
         android:id="@+id/tvDateDisplay"
         android:layout_width="wrap_content"
@@ -143,7 +149,7 @@
         android:layout_marginTop="8dp"
         android:text="DATE: [ TODAY ]"
         android:fontFamily="monospace"
-        android:textColor="#FFD700"
+        android:textColor="@color/toolbar_title"
         android:textSize="12sp"/>
     <!-- Camera/Evidence Placeholder (Deferred) -->
         <androidx.cardview.widget.CardView
@@ -153,7 +159,7 @@
             android:layout_marginTop="16dp"
             android:layout_marginBottom="16dp"
             android:foreground="?attr/selectableItemBackground"
-            app:cardBackgroundColor="#1e1e1e"
+            app:cardBackgroundColor="@color/card_background"
             app:cardCornerRadius="8dp"
             app:cardElevation="4dp"
             >
@@ -167,7 +173,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:text="NO VISUAL PROOF ATTACHED"
-                    android:textColor="#ffd700"
+                    android:textColor="@color/toolbar_title"
                     android:textSize="10sp"
                     android:fontFamily="monospace"/>
 
@@ -192,8 +198,9 @@
         android:textSize="16sp"
         android:textStyle="bold"
         android:fontFamily="monospace"
-        android:backgroundTint="#CF6679"
-        android:textColor="#1E1E1E"/>
+        android:backgroundTint="@color/color_expense"
+        android:textColor="@color/background_primary"/>
     </LinearLayout>
     </ScrollView>
 </LinearLayout>
+</FrameLayout>

@@ -5,6 +5,7 @@ import static android.view.View.VISIBLE;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -21,16 +22,21 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.cardview.widget.CardView;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.stateofthewallet.data.model.Transaction;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -57,6 +63,10 @@ public class AddEntryActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        
+        // Apply saved theme preference
+        applyThemePreference();
+        
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_add_entry);
         setSupportActionBar(findViewById(R.id.toolbar));
@@ -87,14 +97,21 @@ public class AddEntryActivity extends AppCompatActivity {
         }
         else {
             existing = true;
-            etVendor.setText(grabbed.getVendor());
+            etVendor.setText(capBetweenSpacing(grabbed.getVendor()));
             etDamages.setText(String.valueOf(grabbed.getAmount()));
             etNotes.setText(grabbed.getNotes());
             tbIsDeposit.setChecked(grabbed.isDeposit());
             displaySystemDate(grabbed.getDateTimestamp());
-            btnSave.setText("Update");
-            //todo: Delete Button
-
+            btnSave.setText("UPDATE REPORT");
+            
+            // Load the stored image if it exists
+            Bitmap loadedImage = loadImageFromInternalStorage(grabbed.getId());
+            if (loadedImage != null) {
+                cameraImage.setImageBitmap(loadedImage);
+                cameraImage.setVisibility(VISIBLE);
+                cameraMaterial.setVisibility(GONE);
+                capturedBitmap = loadedImage;
+            }
         }
 
 
@@ -114,7 +131,16 @@ public class AddEntryActivity extends AppCompatActivity {
             }
     );
 
+    // from geeks for greeks on capitolizing words after spacing https://www.geeksforgeeks.org/java/java-program-to-capitalize-the-first-letter-of-each-word-in-a-string/
+    public static String capBetweenSpacing(String input){
+            String [] words = input.split("\\s");
+            StringBuilder newString = new StringBuilder();
 
+            for (String word: words){
+                newString.append(Character.toTitleCase(word.charAt(0))).append(word.substring(1)).append(" ");
+            }
+            return newString.toString().trim();
+    }
 
 
 
@@ -131,11 +157,13 @@ public class AddEntryActivity extends AppCompatActivity {
         tvDateDisplay.setText("INCIDENT DADTE: "+dateStr+" (SYSTEM SECURE)" );
     }
     private void reportTransaction() {
-        String vendorName = etVendor.getText().toString();
+        String vendorName = capBetweenSpacing(etVendor.getText().toString());
         String amountStr = etDamages.getText().toString();
         try{
             double amountValue = Double.parseDouble(amountStr);
-            boolean isDeposit = tbIsDeposit.isActivated();
+            double fixedAmount = Double.parseDouble(String.format("%.2f",amountValue));
+            boolean isDeposit = tbIsDeposit.isChecked();  //TODO: DOUBLE CHECK THIS?????????
+            Log.d("false issue - isDeposit", String.valueOf(isDeposit));
 
             /* --- CLOUD STORAGE MISSION BRIEFING ---
             If we were using Firebase Storage (Paid/Spark limits), the logic would be:
@@ -151,13 +179,14 @@ public class AddEntryActivity extends AppCompatActivity {
             */
 
 
-
+            if(etNotes.getText().length()<30){
             if (existing){
                 Transaction t = new Transaction(
                         grabbed.getId(),vendorName,
                         etNotes.getText().toString(),
                         amountValue, isDeposit,
                         selectedDate);
+                Log.d("changing", String.valueOf(t));
 
                 updateTransaction(t);
             }else {
@@ -169,6 +198,7 @@ public class AddEntryActivity extends AppCompatActivity {
                         selectedDate);
                 writeNewTransaction(t);
                 Log.d("reportTransaction", String.valueOf(t));
+            }
             }
 
         }catch(NumberFormatException e){
@@ -182,10 +212,35 @@ public class AddEntryActivity extends AppCompatActivity {
             @Override
             public void onComplete(boolean success, String errorMessage) {
                 if(success) {
-                    Intent i = new Intent(AddEntryActivity.this, MainActivity.class);
-                    startActivity(i);
+                    // Save the image if one was captured
+                    if (capturedBitmap != null) {
+                        saveImageToInternalStorage(t.getId());
+                    }
+                    
+                    // Show celebration message for deposits
+                    if (t.isDeposit()) {
+                        Snackbar.make(findViewById(android.R.id.content), 
+                            "🎉 DEPOSIT RECORDED! SURPLUS INCOMING!", 
+                            Snackbar.LENGTH_LONG).show();
+                    } else {
+                        // Play sound effect for expenses
+                        SoundManager.playSound(AddEntryActivity.this, R.raw.metal_pipe);
+                        Snackbar.make(findViewById(android.R.id.content), 
+                            "💸 EXPENSE RECORDED!", 
+                            Snackbar.LENGTH_LONG).show();
+                    }
+                    
+                    // Return to main activity
+                    btnSave.postDelayed(() -> {
+                        Intent i = new Intent(AddEntryActivity.this, MainActivity.class);
+                        // Pass flag to show confetti if deposit was saved
+                        if (t.isDeposit()) {
+                            i.putExtra("showConfetti", true);
+                        }
+                        startActivity(i);
+                    }, 1500);
                 } else{
-                    Snackbar.make(findViewById(R.id.container),errorMessage,Snackbar.LENGTH_LONG).show();
+                    Snackbar.make(findViewById(android.R.id.content),errorMessage,Snackbar.LENGTH_LONG).show();
                 }
             }
         });
@@ -196,20 +251,34 @@ public class AddEntryActivity extends AppCompatActivity {
             @Override
             public void onComplete(boolean success, String errorMessage) {
                 if(success) {
+                    // Save the image if one was captured or updated
+                    if (capturedBitmap != null) {
+                        saveImageToInternalStorage(t.getId());
+                    }
+                    
+                    // Play sound for expenses
+                    if (!t.isDeposit()) {
+                        SoundManager.playSound(AddEntryActivity.this, R.raw.metal_pipe);
+                    }
+                    
                     Intent i = new Intent(AddEntryActivity.this, MainActivity.class);
                     startActivity(i);
                 } else{
-                    Snackbar.make(findViewById(R.id.container),errorMessage,Snackbar.LENGTH_LONG).show();
+                   Snackbar.make(findViewById(android.R.id.content),errorMessage,Snackbar.LENGTH_LONG).show();
                 }
-            }
-        });
+            }});
     }
 
 
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.mainoptions,menu);
+        getMenuInflater().inflate(R.menu.add_entry_options, menu);
+        // Only show delete button for existing entries
+        MenuItem deleteItem = menu.findItem(R.id.deleteBTN);
+        if (deleteItem != null) {
+            deleteItem.setVisible(existing);
+        }
         return true;
     }
     //give items actions in the menu
@@ -220,17 +289,107 @@ public class AddEntryActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         if (id==R.id.deleteBTN){
-            //TODO: destroyEVIDENCE();
-            return true;}
+            destroyEvidence();
+            return true;
+        }
 
         return super.onOptionsItemSelected(item);
     }
-    private void destroyEvidence(int id){
+    
+    private void destroyEvidence(){
+        if (grabbed == null) return;
+        
+        // Show confirmation dialog
+        new MaterialAlertDialogBuilder(this)
+            .setTitle("CONFIRM DESTRUCTION")
+            .setMessage("Are you sure you want to delete this transaction? This action cannot be undone.")
+            .setPositiveButton("DELETE", (dialog, which) -> {
+                // Delete from Firebase
+                CRUDManager.deleteTransaction(grabbed, AddEntryActivity.this, new CRUDManager.CrudCallback() {
+                    @Override
+                    public void onComplete(boolean success, String errorMessage) {
+                        if (success) {
+                            // Delete the image from local storage
+                            deleteImageFromInternalStorage(grabbed.getId());
+                            
+                            // Show success message
+                            Snackbar.make(findViewById(android.R.id.content), 
+                                "Transaction destroyed successfully", 
+                                Snackbar.LENGTH_SHORT).show();
+                            
+                            // Return to main activity
+                            Intent i = new Intent(AddEntryActivity.this, MainActivity.class);
+                            startActivity(i);
+                        } else {
+                            Snackbar.make(findViewById(android.R.id.content),
+                                "Deletion failed: " + errorMessage,
+                                Snackbar.LENGTH_LONG).show();
+                        }
+                    }
+                });
+            })
+            .setNegativeButton("CANCEL", (dialog, which) -> dialog.dismiss())
+            .show();
+    }
 
-        //todo: if exist delete it
-        //todo: need a coustom design toast or snack bar design
+    // Save image to internal storage
+    private void saveImageToInternalStorage(String transactionId) {
+        if (capturedBitmap == null) return;
+        
+        try {
+            FileOutputStream fos = openFileOutput(transactionId + ".jpg", MODE_PRIVATE);
+            capturedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+            fos.close();
+            Log.d("ImageStorage", "Image saved: " + transactionId);
+        } catch (Exception e) {
+            Log.e("ImageStorage", "Error saving image: " + e.getMessage());
+        }
+    }
 
-        Toast.makeText(this, "TODO: delete transaction", Toast.LENGTH_SHORT).show();
+    // Load image from internal storage
+    private Bitmap loadImageFromInternalStorage(String transactionId) {
+        try {
+            FileInputStream fis = openFileInput(transactionId + ".jpg");
+            Bitmap bitmap = BitmapFactory.decodeStream(fis);
+            fis.close();
+            Log.d("ImageStorage", "Image loaded: " + transactionId);
+            return bitmap;
+        } catch (Exception e) {
+            Log.d("ImageStorage", "Image not found: " + transactionId);
+            return null;
+        }
+    }
+
+    // Delete image from internal storage
+    private void deleteImageFromInternalStorage(String transactionId) {
+        try {
+            File file = new File(getFilesDir(), transactionId + ".jpg");
+            if (file.exists()) {
+                boolean deleted = file.delete();
+                Log.d("ImageStorage", "Image delete status: " + deleted);
+            }
+        } catch (Exception e) {
+            Log.e("ImageStorage", "Error deleting image: " + e.getMessage());
+        }
+    }
+
+    // Apply theme preference from SharedPreferences
+    private void applyThemePreference() {
+        boolean isDarkMode = getSharedPreferences("darkMode", MODE_PRIVATE)
+            .getBoolean("isDarkMode", false);
+        
+        if (isDarkMode) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // Clean up sound resources
+        SoundManager.release();
     }
 
 }

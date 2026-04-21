@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Dark Theme Colors -->
+    <color name="background_primary">#121212</color>
+    <color name="background_secondary">#1E1E1E</color>
+    <color name="card_background">#1E1E1E</color>
+    <color name="text_primary">#FFFFFF</color>
+    <color name="text_secondary">#888888</color>
+    <color name="divider_color">#333333</color>
+    <color name="toolbar_background">#1e1e1e</color>
+    <color name="toolbar_title">#FFD700</color>
+    
+    <!-- Accent Colors (same for both themes) -->
+    <color name="color_income">#4CAF50</color>
+    <color name="color_expense">#CF6679</color>
+    <color name="color_neutral">#FFC107</color>
+</resources>

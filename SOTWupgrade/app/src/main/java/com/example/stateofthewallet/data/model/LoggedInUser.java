@@ -7,10 +7,12 @@ public class LoggedInUser {
 
     private String userId;
     private String displayName;
+    private String usrpassword;
 
-    public LoggedInUser(String userId, String displayName) {
+    public LoggedInUser(String userId, String displayName, String usrpassword ) {
         this.userId = userId;
         this.displayName = displayName;
+        this.usrpassword = usrpassword;
     }
 
     public String getUserId() {
@@ -19,5 +21,21 @@ public class LoggedInUser {
 
     public String getDisplayName() {
         return displayName;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
+
+    public String getUsrpassword() {
+        return usrpassword;
+    }
+
+    public void setUsrpassword(String usrpassword) {
+        this.usrpassword = usrpassword;
     }
 }

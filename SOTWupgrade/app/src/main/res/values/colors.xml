@@ -1,5 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <!-- Basic Colors -->
+    <color name="black">#000</color>
+    <color name="white">#FFF</color>
+    <color name="red">#F00</color>
+    <color name="green">#0F0</color>
+
+    <!-- Light Theme Colors -->
+    <color name="background_primary">#FFFFFF</color>
+    <color name="background_secondary">#F5F5F5</color>
+    <color name="card_background">#FFFFFF</color>
+    <color name="text_primary">#212121</color>
+    <color name="text_secondary">#757575</color>
+    <color name="divider_color">#E0E0E0</color>
+    <color name="toolbar_background">#FFFFFF</color>
+    <color name="toolbar_title">#212121</color>
+    
+    <!-- Accent Colors (same for both themes) -->
+    <color name="color_income">#4CAF50</color>
+    <color name="color_expense">#CF6679</color>
+    <color name="color_neutral">#FFC107</color>
 </resources>

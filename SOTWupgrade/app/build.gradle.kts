@@ -37,6 +37,7 @@ android {
 
 dependencies {
     implementation(platform("com.google.firebase:firebase-bom:34.9.0"))
+    //implementation("nl.dionsegijn:konfetti:2.0.2")  // Not available in standard repos
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)

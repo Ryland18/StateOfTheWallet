@@ -72,15 +72,20 @@ public class AuthManager {
         Pattern up = Pattern.compile("[A-Z]");
         Matcher um = up.matcher(password);
 
-        Pattern lp = Pattern.compile("[0-9]");
-        Matcher lm = lp.matcher(password);
+        Pattern np = Pattern.compile("[0-9]");  // Fixed: numbers/digits
+        Matcher nm = np.matcher(password);
 
-        Pattern wp = Pattern.compile("[a-z]");
-        Matcher wm = wp.matcher(password);
+        Pattern lp = Pattern.compile("[a-z]");
+        Matcher wm = lp.matcher(password);
 
+        // Requirements:
+        // - At least 8 characters long
+        // - At least one uppercase letter
+        // - At least one lowercase letter
+        // - At least one number
+        // - At least one special character
 
-
-        if (password.length() < 8 || !(sm.find())||!(um.find())||!lm.find() || !wm.find()){
+        if (password.length() < 8 || !sm.find() || !um.find() || !nm.find() || !wm.find()){
             return false;
         }else {
             return true;
@@ -91,5 +96,34 @@ public class AuthManager {
     //get current user
     public FirebaseUser getCurrentUser(){
         return auth.getCurrentUser();   //TODO:  Is this the email or User ID?...
+    }
+
+    // Update user display name (codeName)
+    public void updateDisplayName(String displayName, final AuthCallback callback) {
+        if (displayName == null || displayName.isEmpty()) {
+            callback.onComplete(false, "Display name cannot be empty");
+            return;
+        }
+        
+        FirebaseUser user = getCurrentUser();
+        if (user != null) {
+            com.google.firebase.auth.UserProfileChangeRequest profileUpdates = 
+                new com.google.firebase.auth.UserProfileChangeRequest.Builder()
+                    .setDisplayName(displayName)
+                    .build();
+            
+            user.updateProfile(profileUpdates).addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    Log.d(TAG, "Display name updated: " + displayName);
+                    callback.onComplete(true, null);
+                } else {
+                    Log.d(TAG, "Failed to update display name");
+                    callback.onComplete(false, task.getException() != null ? 
+                        task.getException().getMessage() : "Unknown error");
+                }
+            });
+        } else {
+            callback.onComplete(false, "No user currently signed in");
+        }
     }
 }

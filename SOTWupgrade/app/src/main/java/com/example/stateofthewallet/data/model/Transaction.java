@@ -47,7 +47,6 @@ public class Transaction implements Serializable {
     }
     public void setDeposit(boolean deposit) {
         isDeposit = deposit;
-
     }
     public long getDateTimestamp() {
         return dateTimestamp;
